@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggy Randomizer Bingo</title>
+    <!-- html2canvas for downloading PNGs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- canvas-confetti for celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --accent-color: #ff4a4a;
+            --active-color: #3a5fcd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .credits {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 3px;
+        }
+
+        .credits span {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .suggestions {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .suggestions span {
+            color: #bbb;
+            font-weight: 600;
+        }
+
+        .week-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .setup-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-row {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #444;
+            background: #111;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 80%;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            width: 85%;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .download-btn {
+            background-color: #4a5568;
+            margin-top: 15px;
+            width: auto;
+        }
+
+        .card-capture-area {
+            background-color: var(--bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background-color: var(--card-bg);
+            border: 2px solid #444;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            text-align: center;
+            word-wrap: break-word;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .cell:hover {
+            border-color: var(--accent-color);
+        }
+
+        .cell.marked {
+            background-color: var(--active-color);
+            border-color: #63b3ed;
+            color: #fff;
+        }
+
+        .cell.free-space {
+            background-color: #443355;
+            border-color: #9f7aea;
+            padding: 0;
+        }
+
+        .free-space-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .free-space-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 0;
+            text-transform: uppercase;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>aggy randomizer bingo</h1>
+    
+    <div class="credits">
+        Idea by <span>UltimaPhoenix2405</span> | Implemented by <span>misslilmango</span>
+    </div>
+
+    <div class="suggestions">
+        Suggest squares on Twitch: <span>@misslilmango</span> | Discord: <span>lil.mango</span>
+    </div>
+
+    <div class="week-info" id="weekInfo"></div>
+
+    <div class="setup-box">
+        <div class="input-row">
+            <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
+        </div>
+        <button onclick="generateCard()">Generate Card</button>
+    </div>
+
+    <div id="bingoArea" class="hidden">
+        <div id="captureContainer" class="card-capture-area">
+            <h2 id="cardOwnerHeader" style="margin: 0; color: #ff4a4a;"></h2>
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;" id="runSubtitle"></div>
+            <div class="grid" id="bingoGrid"></div>
+        </div>
+        
+        <button class="download-btn" onclick="downloadPNG()">Download Card as PNG</button>
+    </div>
+</div>
+
+<script>
+    /* 
+    ===========================================================================
+    WEEKLY UPDATE ZONE
+    ===========================================================================
+    */
+
+    // STEP 1: CHANGE THE RUN ID
+    // Changing this resets cards for everyone!
+    const CURRENT_RUN_ID = "Week_1_Rando"; 
+
+    // STEP 2: STREAMER IMAGE CONFIG
+    const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
+
+    // STEP 3: THE BINGO ITEM POOL
+    // Add, remove, or swap out game events here. Separate each item with a comma.
+    const BINGO_POOL = [
+        "Dies to sloped terrain",
+        "Gravity death",
+        "Failed speedrun skip",
+        "First-try boss kill",
+        "Bad boss in bad arena",
+        "Dies to basic mob",
+        "+0 weapon boss kill",
+        "Greeds for final hit and dies",
+        "Dies with >30k currency on hand", 
+        "Dies during runback to boss", 
+        "Aggy comments on outfit",
+        "Delayed attack death",
+        "Absence of upgrade mats",
+        "Chat drops the ball on a backseat tip",
+        "Scarlet makes appearance",
+        "Game crashes",
+        "Heals but immediately gets hit",
+        "Aggy asks chat what stat requirements are needed",
+        "Boss gets stuck running into a piece of arena geometry",
+        "Aggy says 'this has never happened before'",
+        "Aggy argues with a lone viewer in chat",
+        "Sip of Windex",
+        "Aggy says 'BWAH'",
+        "PB achieved",
+        "First time chatter gets banned",
+        "Aggy goes on a random tangent",
+        "At least 5 subs gifted",
+        "Chat spams plinK",
+        "Chat gets put in emote only",
+        "Aggy HUH farming",
+        "Fextra being correct for once",
+        "Aggy shrieks like a pterodactyl",
+        "Parky appearance on camera",
+        "Sniped by projectile",
+        "Raid by one of the gang",
+        "Food is ordered",
+        "DS2 scam (he vetos it)",
+        "Chat relays a message from Parky",
+        "No-hit boss kill",
+        "'Why is it called the French challenge?'",
+        "Aggy says 'first try' after dying to a boss at least 3 times",
+        "Skippa da Grace and dies",
+        "no mods, no bans, we cats, we jam",
+        "Aggy denies furry allegations",
+        "Gamer skip on first try",
+    ];
+
+    /* 
+    ===========================================================================
+    END OF WEEKLY UPDATE ZONE
+    ===========================================================================
+    */
+
+    const BINGO_COMBINATIONS = [
+        [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
+        [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
+        [0, 6, 12, 18, 24], [4, 8, 12, 16, 20]
+    ];
+
+    let activeUsername = "";
+    let completedBingos = []; 
+
+    // Dynamic Run Subtitle Setup
+    document.getElementById('weekInfo').innerText = `Current Run: ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
+
+    // --- SEEDABLE RANDOM LOGIC ---
+    function cyrb128(str) {
+        let h1 = 1779033703, h2 = 3024733165, h3 = 3362453659, h4 = 502499485;
+        for (let i = 0, k; i < str.length; i++) {
+            k = str.charCodeAt(i);
+            h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+            h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+            h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+            h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+        }
+        h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+        h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+        h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+        h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+        return [(h1^h2^h3^h4)>>>0];
+    }
+
+    function mulberry32(a) {
+        return function() {
+            var t = a += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
+    }
+
+    // Deterministically shuffles an array using our seeded generator
+    function seededShuffle(array, randomFunc) {
+        let shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(randomFunc() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    // --- GENERATE CARD ---
+    function generateCard() {
+        const username = document.getElementById('usernameInput').value.trim();
+
+        if (!username) {
+            alert("Please enter your Twitch username!");
+            return;
+        }
+        activeUsername = username;
+        completedBingos = []; 
+
+        // Seed includes Username + Weekly ID to guarantee unique math
+        const combinedSeedString = `${username.toLowerCase()}_${CURRENT_RUN_ID}`;
+        const seed = cyrb128(combinedSeedString)[0];
+        const prng = mulberry32(seed);
+
+        const shuffledPool = seededShuffle(BINGO_POOL, prng);
+
+        const gridElement = document.getElementById('bingoGrid');
+        gridElement.innerHTML = '';
+
+        let poolIndex = 0;
+        for (let i = 0; i < 25; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.index = i;
+
+            if (i === 12) {
+                cell.classList.add('free-space', 'marked');
+                
+                const img = document.createElement('img');
+                img.src = STREAMER_IMAGE_URL;
+                img.alt = "Free Space Streamer Pic";
+                img.classList.add('free-space-img');
+                
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    cell.innerText = "FREE SPACE";
+                };
+
+                const label = document.createElement('div');
+                label.classList.add('free-space-text');
+                label.innerText = "FREE SPACE";
+
+                cell.appendChild(img);
+                cell.appendChild(label);
+            } else {
+                cell.innerText = shuffledPool[poolIndex] || "Empty Slot";
+                poolIndex++;
+                
+                cell.addEventListener('click', () => {
+                    cell.classList.toggle('marked');
+                    checkBingo();
+                });
+            }
+            gridElement.appendChild(cell);
+        }
+
+        document.getElementById('cardOwnerHeader').innerText = `${username}'s Bingo Card`;
+        document.getElementById('runSubtitle').innerText = CURRENT_RUN_ID.replace(/_/g, ' ');
+        document.getElementById('bingoArea').classList.remove('hidden');
+    }
+
+    // --- BINGO CHECK ---
+    function checkBingo() {
+        const cells = document.querySelectorAll('.cell');
+        let newBingoDetected = false;
+
+        BINGO_COMBINATIONS.forEach((combination, combIndex) => {
+            const isComboComplete = combination.every(index => cells[index].classList.contains('marked'));
+
+            if (isComboComplete) {
+                if (!completedBingos.includes(combIndex)) {
+                    completedBingos.push(combIndex);
+                    newBingoDetected = true;
+                }
+            } else {
+                const indexInCompleted = completedBingos.indexOf(combIndex);
+                if (indexInCompleted > -1) {
+                    completedBingos.splice(indexInCompleted, 1);
+                }
+            }
+        });
+
+        if (newBingoDetected) {
+            triggerConfetti();
+        }
+    }
+
+    function triggerConfetti() {
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { x: 0.1, y: 0.6 }
+        });
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { x: 0.9, y: 0.6 }
+        });
+    }
+
+    // --- IMAGE GENERATION AND DOWNLOAD ---
+    function downloadPNG() {
+        const element = document.getElementById('captureContainer');
+        
+        html2canvas(element, {
+            backgroundColor: "#1a1a1a",
+            scale: 2,
+            useCORS: true
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${activeUsername}_${CURRENT_RUN_ID}_bingo.png`;
+            link.href = imgData;
+            link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
