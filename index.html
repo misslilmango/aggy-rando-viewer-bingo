@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aggy Randomizer Bingo</title>
+    <!-- html2canvas for downloading PNGs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- canvas-confetti for celebration -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -84,14 +86,22 @@
             gap: 10px;
         }
 
-        input {
+        input, select {
             padding: 10px;
             border: 1px solid #444;
             background: #111;
             color: #fff;
             border-radius: 4px;
             font-size: 1rem;
-            width: 80%;
+        }
+
+        input {
+            width: 50%;
+        }
+
+        select {
+            width: 40%;
+            cursor: pointer;
         }
 
         button {
@@ -103,7 +113,7 @@
             font-size: 1rem;
             cursor: pointer;
             font-weight: bold;
-            width: 85%;
+            width: 93%;
         }
 
         button:hover {
@@ -187,7 +197,6 @@
             text-transform: uppercase;
         }
 
-        /* Styling for the new timestamp sub-header */
         .card-timestamp {
             font-size: 0.75rem;
             color: #666;
@@ -203,7 +212,7 @@
 <body>
 
 <div class="container">
-    <h1>Aggy Chat Bingo</h1>
+    <h1>aggy randomizer bingo</h1>
     
     <div class="credits">
         Idea by <span>UltimaPhoenix2405</span> | Implemented by <span>misslilmango</span>
@@ -222,6 +231,13 @@
     <div class="setup-box">
         <div class="input-row">
             <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
+            <!-- Game Selector Dropdown -->
+            <select id="gameSelect">
+                <option value="elden">Elden Ring</option>
+                <option value="ds1">Dark Souls 1</option>
+                <option value="ds2">Dark Souls 2</option>
+                <option value="ds3">Dark Souls 3</option>
+            </select>
         </div>
         <button onclick="generateCard()">Generate Card</button>
     </div>
@@ -245,15 +261,13 @@
     */
 
     // STEP 1: CHANGE THE RUN ID
-    // Changing this resets cards for everyone!
     const CURRENT_RUN_ID = "Week_1_Rando"; 
 
     // STEP 2: STREAMER IMAGE CONFIG
     const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
 
-    // STEP 3: THE BINGO ITEM POOL
-    // Add, remove, or swap out game events here. Separate each item with a comma.
-    const BINGO_POOL = [
+    // STEP 3: GENERAL OVERLAP POOL
+    const GENERAL_POOL = [
         "Dies to sloped terrain",
         "Gravity death",
         "Failed speedrun skip",
@@ -264,7 +278,7 @@
         "Greeds for final hit and dies",
         "Dies with >30k currency on hand", 
         "Dies during runback to boss", 
-        "Aggy comments on outfit",
+        "Aggy comments on character outfit",
         "Delayed attack death",
         "Absence of upgrade mats",
         "Chat drops the ball on a backseat tip",
@@ -287,7 +301,6 @@
         "Fextra being correct for once",
         "Aggy shrieks like a pterodactyl",
         "Parky appearance on camera",
-        "Sniped by projectile",
         "Raid by one of the gang",
         "Food is ordered",
         "DS2 scam (he vetos it)",
@@ -303,6 +316,32 @@
         "Dies to status effect"
     ];
 
+    // STEP 4: GAME-SPECIFIC POOLS
+    const GAME_POOLS = {
+        elden: [
+            "Tree Sentinel boss at RL 1",
+            "Sniped off Torrent by projectile",
+            "Aggy complains about Ordina skip",
+            "Kills Boc :(",
+            "Acquires Stormhawk Deenh"
+        ],
+        ds1: [
+            "Anor Londo archers shoot Aggy off ledge",
+            "Bone wheel death",
+        ],
+        ds2: [
+            "Aggros an enemy in Majula",
+            "Gets cancelled out of a fog wall animation",
+            "Chat argues about how good/bad the game is",
+            "At least one boss repeated that shouldn't be",
+            "Dies 3+ times in Shrine of Amana"
+        ],
+        ds3: [
+            "Stunlocked to death by a pack of dogs",
+            "Chased by giant crab"
+        ]
+    };
+
     /* ===========================================================================
     END OF WEEKLY UPDATE ZONE
     ===========================================================================
@@ -317,8 +356,21 @@
     let activeUsername = "";
     let completedBingos = []; 
 
-    // Dynamic Run Subtitle Setup
-    document.getElementById('weekInfo').innerText = `Current Run: ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
+    function updateRunSubtitle(gameName) {
+        const readableGame = {
+            elden: "Elden Ring",
+            ds1: "Dark Souls 1",
+            ds2: "Dark Souls 2",
+            ds3: "Dark Souls 3"
+        }[gameName] || "Souls Randomizer";
+
+        document.getElementById('weekInfo').innerText = `Current Run: ${readableGame} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
+    }
+    
+    updateRunSubtitle(document.getElementById('gameSelect').value);
+    document.getElementById('gameSelect').addEventListener('change', (e) => {
+        updateRunSubtitle(e.target.value);
+    });
 
     // --- SEEDABLE RANDOM LOGIC ---
     function cyrb128(str) {
@@ -346,7 +398,6 @@
         }
     }
 
-    // Deterministically shuffles an array using our seeded generator
     function seededShuffle(array, randomFunc) {
         let shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -359,6 +410,7 @@
     // --- GENERATE CARD ---
     function generateCard() {
         const username = document.getElementById('usernameInput').value.trim();
+        const selectedGame = document.getElementById('gameSelect').value;
 
         if (!username) {
             alert("Please enter your Twitch username!");
@@ -367,12 +419,16 @@
         activeUsername = username;
         completedBingos = []; 
 
-        // Seed includes Username + Weekly ID to guarantee unique math
-        const combinedSeedString = `${username.toLowerCase()}_${CURRENT_RUN_ID}`;
+        // Seed merges user name, chosen game, and dynamic weekly string
+        const combinedSeedString = `${username.toLowerCase()}_${selectedGame}_${CURRENT_RUN_ID}`;
         const seed = cyrb128(combinedSeedString)[0];
         const prng = mulberry32(seed);
 
-        const shuffledPool = seededShuffle(BINGO_POOL, prng);
+        // Mix corresponding pool arrays together
+        const gameSpecificPool = GAME_POOLS[selectedGame] || [];
+        const integratedPool = [...GENERAL_POOL, ...gameSpecificPool];
+
+        const shuffledPool = seededShuffle(integratedPool, prng);
 
         const gridElement = document.getElementById('bingoGrid');
         gridElement.innerHTML = '';
@@ -414,22 +470,17 @@
             gridElement.appendChild(cell);
         }
 
-        // Generate and format current localized date/time
         const now = new Date();
         const options = { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit',
+            year: 'numeric', month: 'short', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
             hour12: true 
         };
         const formattedTimestamp = now.toLocaleString(undefined, options);
 
-        // Update card info on-screen
+        const gameLabels = { elden: "Elden Ring", ds1: "Dark Souls 1", ds2: "Dark Souls 2", ds3: "Dark Souls 3" };
         document.getElementById('cardOwnerHeader').innerText = `${username}'s Bingo Card`;
-        document.getElementById('runSubtitle').innerText = CURRENT_RUN_ID.replace(/_/g, ' ');
+        document.getElementById('runSubtitle').innerText = `${gameLabels[selectedGame]} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
         document.getElementById('cardTimestamp').innerText = `Generated on: ${formattedTimestamp}`;
         document.getElementById('bingoArea').classList.remove('hidden');
     }
@@ -461,16 +512,8 @@
     }
 
     function triggerConfetti() {
-        confetti({
-            particleCount: 150,
-            spread: 80,
-            origin: { x: 0.1, y: 0.6 }
-        });
-        confetti({
-            particleCount: 150,
-            spread: 80,
-            origin: { x: 0.9, y: 0.6 }
-        });
+        confetti({ particleCount: 150, spread: 80, origin: { x: 0.1, y: 0.6 } });
+        confetti({ particleCount: 150, spread: 80, origin: { x: 0.9, y: 0.6 } });
     }
 
     // --- IMAGE GENERATION AND DOWNLOAD ---
@@ -484,7 +527,8 @@
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = `${activeUsername}_${CURRENT_RUN_ID}_bingo.png`;
+            const selectedGame = document.getElementById('gameSelect').value;
+            link.download = `${activeUsername}_${selectedGame}_${CURRENT_RUN_ID}_bingo.png`;
             link.href = imgData;
             link.click();
         });
