@@ -207,6 +207,27 @@
         .hidden {
             display: none !important;
         }
+
+        /* Mobile Optimization for Small Screens */
+        @media (max-width: 600px) {
+            .grid {
+                gap: 4px;
+            }
+            
+            .cell {
+                font-size: 0.55rem;
+                padding: 3px;
+                line-height: 1.1;
+            }
+
+            .free-space-text {
+                font-size: 0.5rem;
+            }
+            
+            .card-capture-area {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -301,6 +322,7 @@
         "Fextra being correct for once",
         "Aggy shrieks like a pterodactyl",
         "Parky appearance on camera",
+        "Sniped by projectile",
         "Raid by one of the gang",
         "Food is ordered",
         "DS2 scam (he vetos it)",
