@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aggy Randomizer Bingo</title>
-    <!-- html2canvas for downloading PNGs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- canvas-confetti for celebration -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -240,7 +238,7 @@
     </div>
 
     <div class="suggestions" style="margin-bottom: 3px;">
-        Special thanks to <span>lucybonfire</span> & <span>bumblexp</span>
+        Special thanks to <span>lucybonfire</span> & <span>BumbleXP</span>
     </div>
 
     <div class="suggestions">
@@ -252,7 +250,6 @@
     <div class="setup-box">
         <div class="input-row">
             <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
-            <!-- Game Selector Dropdown -->
             <select id="gameSelect">
                 <option value="elden">Elden Ring</option>
                 <option value="ds1">Dark Souls 1</option>
@@ -281,13 +278,10 @@
     ===========================================================================
     */
 
-    // STEP 1: CHANGE THE RUN ID
-    const CURRENT_RUN_ID = "Week_29_Rando"; 
-
-    // STEP 2: STREAMER IMAGE CONFIG
+    // STEP 1: STREAMER IMAGE CONFIG
     const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
 
-    // STEP 3: GENERAL OVERLAP POOL
+    // STEP 2: GENERAL OVERLAP POOL
     const GENERAL_POOL = [
         "Dies to sloped terrain",
         "Gravity death",
@@ -339,7 +333,7 @@
         "Aggy brings out 'the guy'"
     ];
 
-    // STEP 4: GAME-SPECIFIC POOLS
+    // STEP 3: GAME-SPECIFIC POOLS
     const GAME_POOLS = {
         elden: [
             "Tree Sentinel boss at RL 1",
@@ -383,6 +377,20 @@
     let activeUsername = "";
     let completedBingos = []; 
 
+    // Helper function to calculate the current Year and Week Number of the year (ISO-8601)
+    function getYearAndWeekString() {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        // Thursday in current week decides the year.
+        d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+        const week1 = new Date(d.getFullYear(), 0, 4);
+        // Adjust to Thursday in week 1 and calculate weeks between then and now
+        const weekNum = 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        return `Year_${d.getFullYear()}_Week_${weekNum}`;
+    }
+
+    const CURRENT_RUN_ID = getYearAndWeekString();
+
     function updateRunSubtitle(gameName) {
         const readableGame = {
             elden: "Elden Ring",
@@ -391,7 +399,9 @@
             ds3: "Dark Souls 3"
         }[gameName] || "Souls Randomizer";
 
-        document.getElementById('weekInfo').innerText = `Current Run: ${readableGame} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
+        // Converts "Year_2026_Week_29" into "Year 2026 Week 29" for clean reading
+        const cleanRunLabel = CURRENT_RUN_ID.replace(/_/g, ' ');
+        document.getElementById('weekInfo').innerText = `Current Run: ${readableGame} (${cleanRunLabel})`;
     }
     
     updateRunSubtitle(document.getElementById('gameSelect').value);
