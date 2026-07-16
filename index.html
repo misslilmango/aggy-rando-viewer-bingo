@@ -34,9 +34,12 @@
             text-align: center;
         }
 
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 5px;
+        /* Responsive styling for the new header image */
+        .header-logo {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 15px auto;
         }
 
         .credits {
@@ -68,7 +71,7 @@
             font-weight: 600;
         }
 
-        /* Beautiful warning notice for weekly reset */
+        /* warning notice for weekly reset */
         .reset-notice {
             font-size: 0.78rem;
             color: #ff9f9f;
@@ -200,6 +203,7 @@
             display: block;
         }
 
+        /* container to hold the larger multi-line text area */
         .free-space-controls {
             position: absolute;
             top: 0;
@@ -214,6 +218,7 @@
             padding: 6px;
         }
 
+        /* multi-line text area for custom free space */
         .free-space-input {
             background: transparent !important;
             color: #fff !important;
@@ -288,7 +293,8 @@
 <body>
 
 <div class="container">
-    <h1>Aggy Chat Bingo</h1>
+    <!-- Header Image replaces h1 text -->
+    <img id="headerImage" class="header-logo" alt="Aggy Chat Bingo">
     
     <div class="credits">
         Idea by <span>UltimaPhoenix2405</span> | Implemented by <span>misslilmango</span>
@@ -303,9 +309,9 @@
     </div>
 
     <div class="week-info" id="weekInfo"></div>
-    
+
     <div class="reset-notice">
-        ⚠️ <strong>Note:</strong> The seed updates Sundays at 11:00PM. Cards reset at that time!
+        ⚠️ <strong>Note:</strong> The seed/all cards update Sundays at 11:00 PM.
     </div>
 
     <div class="setup-box">
@@ -340,13 +346,16 @@
     ===========================================================================
     */
 
-    // STEP 1: AGGY IMAGE CONFIG
+    // STEP 1: CONFIG HEADER IMAGE URL
+    const HEADER_IMAGE_URL = "https://i.imgur.com/JVSYh8m.png";
+
+    // STEP 2: AGGY IMAGE CONFIG
     const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
 
-    // STEP 2: GENERAL OVERLAP POOL
+    // STEP 3: GENERAL OVERLAP POOL
     const GENERAL_POOL = [
         "Dies to sloped terrain",
-        "Parkour related gravity death",
+        "Gravity death",
         "Failed speedrun skip",
         "First-try boss kill",
         "Bad boss in bad arena",
@@ -388,23 +397,22 @@
         "Aggy says 'first try' after dying to a boss at least 3 times",
         "Skippa da Grace and dies",
         "no mods, no bans, we cats, we jam",
-        "Aggy denies the furry allegations",
+        "Aggy denies furry allegations",
         "Gamer skip on first try",
         "Aggy acknowledges why he never acknowledges YT chat",
         "Dies to status effect",
         "Aggy brings out 'the guy'",
-        "Something unthinkable happens and Aggy yells 'WHAAAT?!?'",
-        "Aggy makes the gnome sound",
-        "Aggy wearing a shirt that's not black, white, or grey"
+        "Something unthinkable happens and Aggy yells 'WHAAAAAT?!?'",
+        "Aggy names gnome sound"
     ];
 
-    // STEP 3: GAME-SPECIFIC POOLS
+    // STEP 4: GAME-SPECIFIC POOLS
     const GAME_POOLS = {
         elden: [
             "Boss killed at RL 1",
             "Sniped off Torrent by projectile",
             "Aggy complains about Ordina skip",
-            "Aggy kills Boc (SAD)",
+            "Kills Boc :(",
             "Acquires Stormhawk Deenh"
         ],
         ds1: [
@@ -424,8 +432,17 @@
         ds3: [
             "Stunlocked to death by a pack of dogs",
             "Chased by giant crab",
-            "Forced to kill Dancer replacement to acquire banner"
-            "Irithyll jailers drain HP to less than half"
+            "Forced to kill Dancer replacement to acquire banner",
+            "Midir or Gael replacement in a tiny boss room",
+            "Aldrich arrow rain tracking lasts way too long",
+            "Died trying to do the Firelink tree jump",
+            "Dreg Heap angel laser-beams him out of the air",
+            "Grand Archives ghost hands curse him",
+            "Champion Gundyr kicks him off the arena",
+            "Gravity death on a Lothric elevator shaft",
+            "Fat-rolling through Farron Keep swamp",
+            "Jailer shrinks max HP to 1",
+            "Sulyvahn's Beast bridge spawn prevents progress"
         ]
     };
 
@@ -433,6 +450,9 @@
     END OF WEEKLY UPDATE ZONE
     ===========================================================================
     */
+
+    // Set the source of the header image from our config
+    document.getElementById('headerImage').src = HEADER_IMAGE_URL;
 
     const BINGO_COMBINATIONS = [
         [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
@@ -449,7 +469,7 @@
         const currentDay = d.getDay(); // 0 is Sunday, 1 is Monday...
         const currentHour = d.getHours();
 
-        // If it is Sunday and past 11:00 PM (23:00), we roll over to the next week/seed
+        // If it is Sunday and past 11:00 PM (23:00), we roll over to the next week early.
         let targetOffset = 0;
         if (currentDay === 0 && currentHour >= 23) {
             targetOffset = 1; 
@@ -622,6 +642,7 @@
         }
     }
 
+    // --- CONFETTI ---
     function triggerConfetti() {
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.1, y: 0.6 } });
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.9, y: 0.6 } });
