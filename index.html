@@ -34,7 +34,6 @@
             text-align: center;
         }
 
-        /* Responsive styling for the new header image */
         .header-logo {
             max-width: 100%;
             height: auto;
@@ -71,7 +70,7 @@
             font-weight: 600;
         }
 
-        /* warning notice for weekly reset */
+        /* Beautiful warning notice for daily reset */
         .reset-notice {
             font-size: 0.78rem;
             color: #ff9f9f;
@@ -114,11 +113,11 @@
         }
 
         input {
-            width: 50%;
+            width: 45%;
         }
 
         select {
-            width: 40%;
+            width: 45%;
             cursor: pointer;
         }
 
@@ -203,7 +202,6 @@
             display: block;
         }
 
-        /* container to hold the larger multi-line text area */
         .free-space-controls {
             position: absolute;
             top: 0;
@@ -218,7 +216,6 @@
             padding: 6px;
         }
 
-        /* multi-line text area for custom free space */
         .free-space-input {
             background: transparent !important;
             color: #fff !important;
@@ -264,7 +261,6 @@
             display: none !important;
         }
 
-        /* Mobile Optimization for Small Screens */
         @media (max-width: 600px) {
             .grid {
                 gap: 4px;
@@ -294,7 +290,7 @@
 
 <div class="container">
     <!-- Header Image replaces h1 text -->
-    <img id="headerImage" class="header-logo" alt="Aggy Chat Bingo">
+    <img id="headerImage" class="header-logo" alt="Aggy Chat Bingo Header">
     
     <div class="credits">
         Idea by <span>UltimaPhoenix2405</span> | Implemented by <span>misslilmango</span>
@@ -311,18 +307,19 @@
     <div class="week-info" id="weekInfo"></div>
 
     <div class="reset-notice">
-        ⚠️ <strong>Note:</strong> The seed/all cards update Sundays at 11:00 PM.
+        ⚠️ <strong>Note:</strong> The seed updates <strong>daily at 6:00 AM</strong>.
     </div>
 
     <div class="setup-box">
         <div class="input-row">
             <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
-            <!-- Game Selector Dropdown -->
+            <!-- Game Selector Dropdown Menu Options -->
             <select id="gameSelect">
-                <option value="elden">Elden Ring</option>
-                <option value="ds1">Dark Souls 1</option>
-                <option value="ds2">Dark Souls 2</option>
-                <option value="ds3">Dark Souls 3</option>
+                <option value="elden_rando">Elden Ring Rando</option>
+                <option value="ds1_rando">Dark Souls 1 Rando</option>
+                <option value="ds2_rando">Dark Souls 2 Rando</option>
+                <option value="ds3_rando">Dark Souls 3 Rando</option>
+                <option value="stream_bingo">Stream Bingo Match</option>
             </select>
         </div>
         <button onclick="generateCard()">Generate Card</button>
@@ -352,8 +349,8 @@
     // STEP 2: AGGY IMAGE CONFIG
     const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
 
-    // STEP 3: GENERAL OVERLAP POOL
-    const GENERAL_POOL = [
+    // STEP 3: RANDO-ONLY GENERAL POOL
+    const RANDO_GENERAL_POOL = [
         "Dies to sloped terrain",
         "Parkour related gravity death",
         "Failed speedrun skip",
@@ -407,34 +404,79 @@
         "Aggy wears colour besides black, white, or grey"
     ];
 
-    // STEP 4: GAME-SPECIFIC POOLS
+    // STEP 4: BINGO MATCH POOL
+    const STREAM_BINGO_POOL = [
+        "Both players choose the same starting square",
+        "Both players enter the same boss fight within 30 seconds",
+        "A square is claimed while Aggy is on a loading screen",
+        "Aggy gets first square",
+        "Either player completes 2+ squares at once",
+        "Opponent gets first square",
+        "Aggy gets poisoned/rotted",
+        "Aggy is Red Team",
+        "Opponent is Red Team",
+        "Aggy's square gets sniped",
+        "Aggy fails a skip 2+ times",
+        "Aggy claims a square with zero healing flasks left",
+        "Skippa da Grace and dies",
+        "Aggy leads by 2+ squares",
+        "Bingo concludes by majority",
+        "Bingo concludes by line completion",
+        "Base game bingo",
+        "DLC bingo",
+        "Chatter tries to spoil opponent gameplay",
+        "Aggy dies to a basic mob",
+        "Aggy gets knocked off Torrent",
+        "Aggy dies when boss is less than 10% health",
+        "Aggy blocks opponent's line",
+        "Aggy fails to exit to title screen before death",
+        "Either player loses 20k+ runes",
+        "Aggy kills Remembrance Boss first try",
+        "Chat spams HOLY",
+        "Aggy has progress towards 3+ squares",
+        "Aggy kills a friendly NPC",
+        "At least 5 subs gifted during stream",
+        "Aggy dies during runback to boss",
+        "Either player greeds for final hit and dies",
+        "No-hit boss kill",
+        "Boss gets stuck running into a piece of arena geometry",
+        "Aggy heals but immediately gets hit",
+        "Aggy uses Wild Strikes",
+        "Aggy predicts opponents' next square",
+        "A single kill gives progress for 3+ squares",
+        "Commentator misses massive by looking at the other player",
+        "Aggy goes silent for 3+ minutes",
+        "Majority betting on opponent winning"
+    ];
+
+    // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
     const GAME_POOLS = {
-        elden: [
+        elden_rando: [
             "Boss killed at RL 1",
             "Sniped off Torrent by projectile",
             "Aggy complains about Ordina skip",
             "Kills Boc (SAD)",
             "Acquires Stormhawk Deenh"
         ],
-        ds1: [
+        ds1_rando: [
             "Anor Londo archers shoot Aggy off ledge",
             "Bone wheel death",
             "Enemy mob makes it into Seath's arena",
             "Uses crossbow",
             "Dragon butt in Undead Burg"
         ],
-        ds2: [
+        ds2_rando: [
             "Aggros an enemy in Majula",
             "Gets cancelled out of a fog wall animation",
             "Chat argues about how good/bad the game is",
             "At least one boss repeated that shouldn't be",
             "Dies 3+ times in Shrine of Amana"
         ],
-        ds3: [
+        ds3_rando: [
             "Stunlocked to death by a pack of dogs",
             "Chased by giant crab",
             "Forced to kill Dancer replacement to acquire banner",
-            "Jailer shrinks max HP to 1",
+            "Jailer shrinks max HP to 1"
         ]
     };
 
@@ -455,30 +497,33 @@
     let activeUsername = "";
     let completedBingos = []; 
 
-    // Dynamic Seed Calculation targeting Sunday nights at 11:00 PM (23:00)
     function getYearAndWeekString() {
         const d = new Date();
-        const currentDay = d.getDay(); // 0 is Sunday, 1 is Monday...
         const currentHour = d.getHours();
 
-        // If it is Sunday and past 11:00 PM (23:00), we roll over to the next week early.
-        let targetOffset = 0;
-        if (currentDay === 0 && currentHour >= 23) {
-            targetOffset = 1; 
+        // If it's before 6:00 AM, treat it as the previous calendar day's stream session
+        if (currentHour < 6) {
+            d.setDate(d.getDate() - 1);
         }
 
-        d.setHours(0, 0, 0, 0);
-        d.setDate(d.getDate() + (targetOffset * 7));
-        d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
-        const week1 = new Date(d.getFullYear(), 0, 4);
-        const weekNum = Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-        return `Year_${d.getFullYear()}_Week_${weekNum}`;
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+
+        return `Run_${year}-${month}-${day}`;
     }
 
     const CURRENT_RUN_ID = getYearAndWeekString();
 
     function updateRunSubtitle(gameName) {
-        const readableGame = { elden: "Elden Ring", ds1: "Dark Souls 1", ds2: "Dark Souls 2", ds3: "Dark Souls 3" }[gameName] || "Souls Randomizer";
+        const readableGame = { 
+            elden_rando: "Elden Ring Rando", 
+            ds1_rando: "Dark Souls 1 Rando", 
+            ds2_rando: "Dark Souls 2 Rando", 
+            ds3_rando: "Dark Souls 3 Rando",
+            stream_bingo: "Elden Ring Bingo"
+        }[gameName] || "Souls Challenge";
+
         const cleanRunLabel = CURRENT_RUN_ID.replace(/_/g, ' ');
         document.getElementById('weekInfo').innerText = `Current Run: ${readableGame} (${cleanRunLabel})`;
     }
@@ -539,8 +584,13 @@
         const seed = cyrb128(combinedSeedString)[0];
         const prng = mulberry32(seed);
 
-        const gameSpecificPool = GAME_POOLS[selectedGame] || [];
-        const integratedPool = [...GENERAL_POOL, ...gameSpecificPool];
+        let integratedPool = [];
+        if (selectedGame === 'stream_bingo') {
+            integratedPool = [...STREAM_BINGO_POOL];
+        } else {
+            const gameSpecificPool = GAME_POOLS[selectedGame] || [];
+            integratedPool = [...RANDO_GENERAL_POOL, ...gameSpecificPool];
+        }
 
         const shuffledPool = seededShuffle(integratedPool, prng);
 
@@ -601,7 +651,13 @@
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
         const formattedTimestamp = now.toLocaleString(undefined, options);
 
-        const gameLabels = { elden: "Elden Ring", ds1: "Dark Souls 1", ds2: "Dark Souls 2", ds3: "Dark Souls 3" };
+        const gameLabels = { 
+            elden_rando: "Elden Ring Rando", 
+            ds1_rando: "Dark Souls 1 Rando", 
+            ds2_rando: "Dark Souls 2 Rando", 
+            ds3_rando: "Dark Souls 3 Rando",
+            stream_bingo: "Stream Bingo Match"
+        };
         document.getElementById('cardOwnerHeader').innerText = `${username}'s Bingo Card`;
         document.getElementById('runSubtitle').innerText = `${gameLabels[selectedGame]} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
         document.getElementById('cardTimestamp').innerText = `Generated on: ${formattedTimestamp}`;
@@ -634,7 +690,7 @@
         }
     }
 
-    // --- CONFETTI ---
+    // --- CONFETTI CELEBRATION ---
     function triggerConfetti() {
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.1, y: 0.6 } });
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.9, y: 0.6 } });
