@@ -70,7 +70,7 @@
             font-weight: 600;
         }
 
-        /* Beautiful warning notice for daily reset */
+        /* Warning notice for daily reset */
         .reset-notice {
             font-size: 0.78rem;
             color: #ff9f9f;
@@ -289,7 +289,6 @@
 <body>
 
 <div class="container">
-    <!-- Header Image replaces h1 text -->
     <img id="headerImage" class="header-logo" alt="Aggy Chat Bingo Header">
     
     <div class="credits">
@@ -313,7 +312,7 @@
     <div class="setup-box">
         <div class="input-row">
             <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
-            <!-- Game Selector Dropdown Menu Options -->
+            <!-- Selector Menus Options - stream_bingo is explicitly 'Elden Ring Bingo' -->
             <select id="gameSelect">
                 <option value="elden_rando">Elden Ring Rando</option>
                 <option value="ds1_rando">Dark Souls 1 Rando</option>
@@ -404,7 +403,7 @@
         "Aggy wears colour besides black, white, or grey"
     ];
 
-    // STEP 4: BINGO MATCH POOL
+    // STEP 4: BINGO MATCH POOL (Your curated items list)
     const STREAM_BINGO_POOL = [
         "Both players choose the same starting square",
         "Both players enter the same boss fight within 30 seconds",
@@ -466,7 +465,6 @@
         "Uses a flask to resummon Torrent mid fight",
         "First try gamer skip; Sellia, Sewers, Thollier, Ordina",
         "Uses Memory of Grace"
-
     ];
 
     // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
@@ -505,7 +503,6 @@
     ===========================================================================
     */
 
-    // Set the source of the header image from our config
     document.getElementById('headerImage').src = HEADER_IMAGE_URL;
 
     const BINGO_COMBINATIONS = [
@@ -521,7 +518,6 @@
         const d = new Date();
         const currentHour = d.getHours();
 
-        // If it's before 6:00 AM, treat it as the previous calendar day's stream session
         if (currentHour < 6) {
             d.setDate(d.getDate() - 1);
         }
@@ -676,7 +672,7 @@
             ds1_rando: "Dark Souls 1 Rando", 
             ds2_rando: "Dark Souls 2 Rando", 
             ds3_rando: "Dark Souls 3 Rando",
-            stream_bingo: "Stream Bingo Match"
+            stream_bingo: "Elden Ring Bingo"
         };
         document.getElementById('cardOwnerHeader').innerText = `${username}'s Bingo Card`;
         document.getElementById('runSubtitle').innerText = `${gameLabels[selectedGame]} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
