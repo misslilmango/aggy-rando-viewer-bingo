@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aggy Randomizer Bingo</title>
+    <title>Souls Viewer Bingo</title>
     <!-- html2canvas for downloading PNGs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- canvas-confetti for celebration -->
@@ -70,7 +70,7 @@
             font-weight: 600;
         }
 
-        /* Warning notice for daily reset */
+        /* Notice banner styling */
         .reset-notice {
             font-size: 0.78rem;
             color: #ff9f9f;
@@ -78,10 +78,45 @@
             border: 1px dashed rgba(255, 74, 74, 0.3);
             padding: 8px 12px;
             border-radius: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: inline-block;
             max-width: 90%;
             line-height: 1.3;
+        }
+
+        /* Card Instructions Block Style */
+        .info-box {
+            background: #242424;
+            border: 1px solid #383838;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: #ccc;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #fff;
+            border-bottom: 1px solid #383838;
+            padding-bottom: 4px;
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        .info-box li strong {
+            color: var(--accent-color);
         }
 
         .setup-box {
@@ -309,10 +344,18 @@
         ⚠️ <strong>Note:</strong> The seed updates <strong>daily at 6:00 AM</strong>.
     </div>
 
+    <div class="info-box">
+        <h3>How to Play & Board Options</h3>
+        <ul>
+            <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to LilAggy's weekly randomizer gameplay.</li>
+            <li><strong>Elden Ring Bingo Mode:</strong> This pool is universal and built to work for ANY streamer matchup, including Bingo Brawlers events. When playing, generic text indicators like "Gets first square" apply to the streamer you are currently rooting for. Explicit targets like "Opponent gets first square" track their match rival.</li>
+            <li><strong>Multiple Match Cycles:</strong> If you need multiple cards before the 6:00 AM reset occurs, simply append a number to your username (e.g., enter username, then username1, then username2, and so on).</li>
+        </ul>
+    </div>
+
     <div class="setup-box">
         <div class="input-row">
             <input type="text" id="usernameInput" placeholder="Twitch Username" autocomplete="off">
-            <!-- Selector Menus Options - stream_bingo is explicitly 'Elden Ring Bingo' -->
             <select id="gameSelect">
                 <option value="elden_rando">Elden Ring Rando</option>
                 <option value="ds1_rando">Dark Souls 1 Rando</option>
@@ -403,28 +446,30 @@
         "Aggy wears colour besides black, white, or grey"
     ];
 
-    // STEP 4: BINGO MATCH POOL (Your curated items list)
+    // STEP 4: BINGO MATCH POOL
     const STREAM_BINGO_POOL = [
         "Both players choose the same starting square",
         "Both players enter the same boss fight within 30 seconds",
-        "A square is claimed during a loading screen",
-        "Gets first square",
+        "Opponent claims square during a loading screen",
         "Either player completes 2+ squares at once",
         "Opponent gets first square",
         "Gets poisoned/rotted",
-        "Square gets sniped",
         "Fails a skip 2+ times",
         "Claims a square with zero healing flasks left",
         "Skippa da Grace and dies",
         "2+ square lead",
-        "Bingo concludes by majority",
+        "Both players die to the same boss",
+        "Sniped because of a death",
+        "One player blocks all opponent lines",
+        "Technical difficulties",
+        "Knocked off a ladder",
         "Bingo concludes by line completion",
         "Dies to a basic mob",
         "Gets knocked off Torrent",
         "Dies when boss is less than 10% health",
-        "Blocks opponent's line",
+        "Gets middle square",
         "Fails to exit to title screen before death",
-        "Either player loses 20k+ runes",
+        "Either player loses 20k+ runes by death or abandonment",
         "Kills Remembrance Boss first try",
         "Chat spams HOLY",
         "Progress towards 3+ squares",
@@ -437,10 +482,10 @@
         "Heals but immediately gets hit",
         "Uses Wild Strikes, Unsheathe, or Square Off",
         "Predicts opponents' next square",
-        "A single kill gives progress for 2+ squares",
-        "Commentator misses massive play by looking at the other player",
+        "A single kill gives progress for 2+ squares for either player",
+        "Commentator misses massive play by looking at opponent",
         "Goes silent for 2+ minutes",
-        "Crashing out/dooming",
+        "Either player crashing out/dooming",
         "Takes the lead after being 2+ squares behind",
         "2+ deaths on a boss",
         "Dies to fall damage",
@@ -454,7 +499,6 @@
         "Wears Rya's Robes, Forg Mask, Bird Slut, or Dane's Hat",
         "'Somewhere, a heavy door has opened'",
         "Takes a coffin for a joyride",
-        "Kills a non-boss enemy that is a boss elsewhere",
         "Finishes a boss with a kukri or throwing knife",
         "Equips a scarseal or soreseal talisman",
         "Uses any spell or incantation",
@@ -463,7 +507,8 @@
         "Successful bow cancel tech for speedge",
         "Uses a flask to resummon Torrent mid fight",
         "First try gamer skip; Sellia, Sewers, Thollier, Ordina",
-        "Uses Memory of Grace"
+        "Uses Memory of Grace",
+        "'HOLY SCHMOLY'"
     ];
 
     // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
@@ -493,7 +538,7 @@
             "Stunlocked to death by a pack of dogs",
             "Chased by giant crab",
             "Forced to kill Dancer replacement to acquire banner",
-            "Jailer shrinks max HP to 1"
+            "Jailer shrinks max HP to 50% or less"
         ]
     };
 
