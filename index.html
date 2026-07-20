@@ -373,16 +373,21 @@
 
 <script>
     /* ===========================================================================
-    WEEKLY UPDATE ZONE
+    UPDATE ZONE
     ===========================================================================
     */
 
     // STEP 1: CONFIG HEADER IMAGE URL
     const HEADER_IMAGE_URL = "https://i.imgur.com/ZnQQYbK.png";
 
-    // STEP 2: DYNAMIC MIDDLE IMAGE
-    const RANDO_IMAGE_URL = "https://i.imgur.com/uFbwFff.png";
-    const BINGO_IMAGE_URL = "https://i.imgur.com/fqnCM30.jpeg";
+    // STEP 2: MODE-SPECIFIC MIDDLE IMAGES
+    const MODE_IMAGES = {
+        ds1_rando: "https://i.imgur.com/uFbwFff.png",
+        ds2_rando: "https://i.imgur.com/l0ePoIq.png",
+        ds3_rando: "https://i.imgur.com/lo5JGEN.jpeg",
+        elden_rando: "https://i.imgur.com/9cp5QIu.jpeg",
+        stream_bingo: "https://i.imgur.com/fqnCM30.jpeg"
+    };
 
     // STEP 3: RANDO-ONLY GENERAL POOL
     const RANDO_GENERAL_POOL = [
@@ -537,7 +542,7 @@
     };
 
     /* ===========================================================================
-    END OF WEEKLY UPDATE ZONE
+    END OF UPDATE ZONE
     ===========================================================================
     */
 
@@ -615,7 +620,7 @@
 
     function seededShuffle(array, randomFunc) {
         let shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
+        for (let i = shuffled.length -1; i > 0; i--) {
             const j = Math.floor(randomFunc() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
@@ -661,8 +666,8 @@
                 cell.classList.add('free-space', 'marked');
                 
                 const img = document.createElement('img');
-                // Select middle asset path based on active mode string criteria
-                img.src = (selectedGame === 'stream_bingo') ? BINGO_IMAGE_URL : RANDO_IMAGE_URL;
+                // Fetch from map, fallback to Elden Rando if undefined
+                img.src = MODE_IMAGES[selectedGame] || MODE_IMAGES['elden_rando'];
                 img.alt = "Free Space Asset Pic";
                 img.classList.add('free-space-img');
                 
