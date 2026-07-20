@@ -339,7 +339,7 @@
     <div class="info-box">
         <h3>How to Play & Board Options</h3>
         <ul>
-            <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to LilAggy's weekly randomizer gameplay.</li>
+            <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to tracking LilAggy's weekly randomizer gameplay.</li>
             <li><strong>Elden Ring Bingo Mode:</strong> This pool is universal and built to work for ANY streamer matchup, including Bingo Brawlers events. When playing, generic text indicators like "Gets first square" apply to the streamer you are currently rooting for. Explicit targets like "Opponent gets first square" track their match rival.</li>
             <li><strong>Boards Reset at 6AM Daily.</strong> If you need multiple cards before the reset, simply append a number to your username (e.g., username1).</li>
         </ul>
@@ -380,8 +380,9 @@
     // STEP 1: CONFIG HEADER IMAGE URL
     const HEADER_IMAGE_URL = "https://i.imgur.com/ZnQQYbK.png";
 
-    // STEP 2: MIDDLE SQUARE IMAGE CONFIG
-    const STREAMER_IMAGE_URL = "https://i.imgur.com/fqnCM30.jpeg";
+    // STEP 2: DYNAMIC MIDDLE IMAGE
+    const RANDO_IMAGE_URL = "https://i.imgur.com/uFbwFff.png";
+    const BINGO_IMAGE_URL = "https://i.imgur.com/fqnCM30.jpeg";
 
     // STEP 3: RANDO-ONLY GENERAL POOL
     const RANDO_GENERAL_POOL = [
@@ -659,8 +660,9 @@
                 cell.classList.add('free-space', 'marked');
                 
                 const img = document.createElement('img');
-                img.src = STREAMER_IMAGE_URL;
-                img.alt = "Free Space Streamer Pic";
+                // Select middle asset path based on active mode string criteria
+                img.src = (selectedGame === 'stream_bingo') ? BINGO_IMAGE_URL : RANDO_IMAGE_URL;
+                img.alt = "Free Space Asset Pic";
                 img.classList.add('free-space-img');
                 
                 img.onerror = function() {
