@@ -334,10 +334,6 @@
         Special thanks to <span>lucybonfire</span> & <span>BumbleXP</span>
     </div>
 
-    <div class="suggestions">
-        Suggest squares on Twitch: <span>misslilmango</span> | Discord: <span>lil.mango</span>
-    </div>
-
     <div class="week-info" id="weekInfo"></div>
 
     <div class="info-box">
@@ -345,7 +341,7 @@
         <ul>
             <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to LilAggy's weekly randomizer gameplay.</li>
             <li><strong>Elden Ring Bingo Mode:</strong> This pool is universal and built to work for ANY streamer matchup, including Bingo Brawlers events. When playing, generic text indicators like "Gets first square" apply to the streamer you are currently rooting for. Explicit targets like "Opponent gets first square" track their match rival.</li>
-            <li><strong>Multiple Match Cycles:</strong> If you need multiple cards before the 6:00 AM reset occurs, simply append a number to your username (e.g., enter username, then username1, then username2, and so on).</li>
+            <li><strong>Boards Reset at 6AM Daily.</strong> If you need multiple cards before the reset, simply append a number to your username (e.g., username1).</li>
         </ul>
     </div>
 
@@ -382,10 +378,10 @@
     */
 
     // STEP 1: CONFIG HEADER IMAGE URL
-    const HEADER_IMAGE_URL = "https://i.imgur.com/JVSYh8m.png";
+    const HEADER_IMAGE_URL = "https://i.imgur.com/ZnQQYbK.png";
 
-    // STEP 2: AGGY IMAGE CONFIG
-    const STREAMER_IMAGE_URL = "https://static-cdn.jtvnw.net/jtv_user_pictures/5b85bd43-3b91-4fd2-bc8c-1e57cf85d643-profile_image-300x300.png";
+    // STEP 2: MIDDLE SQUARE IMAGE CONFIG
+    const STREAMER_IMAGE_URL = "https://static.wikia.nocookie.net/eldenring/images/5/57/Painting-AET220_123_a10.png/revision/latest?cb=20240314224456";
 
     // STEP 3: RANDO-ONLY GENERAL POOL
     const RANDO_GENERAL_POOL = [
@@ -444,8 +440,8 @@
 
     // STEP 4: BINGO MATCH POOL
     const STREAM_BINGO_POOL = [
-        "Both players choose the same starting square",
-        "Both players enter the same boss fight within 30 seconds",
+        "Players choose the same starting square",
+        "Players enter the same boss fight within 30 seconds",
         "Opponent claims square during a loading screen",
         "Either player completes 2+ squares at once",
         "Opponent gets first square",
@@ -454,7 +450,7 @@
         "Claims a square with zero healing flasks left",
         "Skippa da Grace and dies",
         "2+ square lead",
-        "Both players die to the same boss",
+        "Players die to the same boss",
         "Sniped because of a death",
         "One player blocks all opponent lines",
         "Technical difficulties",
@@ -492,8 +488,8 @@
         "Levels anything but Vigor first",
         "Kills Malenia, Mohg, Midra, or Metyr",
         "Gets bled or frosted by an enemy",
-        "Wears Rya's Robes, Forg Mask, Bird Slut, or Dane's Hat",
-        "'Somewhere, a heavy door has opened'",
+        "Wears Rya's Robes, Albinauric Mask, Gravebird Armour, or Dane's Hat",
+        "'Somewhere, a heavy door has opened' for either player",
         "Takes a coffin for a joyride",
         "Finishes a boss with a kukri or throwing knife",
         "Equips a scarseal or soreseal talisman",
@@ -504,7 +500,7 @@
         "Uses a flask to resummon Torrent mid fight",
         "First try gamer skip; Sellia, Sewers, Thollier, Ordina",
         "Uses Memory of Grace",
-        "'HOLY SCHMOLY'"
+        "'HOLY SCHMOLY' by either player"
     ];
 
     // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
