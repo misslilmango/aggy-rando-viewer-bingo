@@ -135,10 +135,11 @@
             display: flex;
             width: 100%;
             justify-content: center;
+            align-items: center;
             gap: 10px;
         }
 
-        input, select {
+        input[type="text"], select {
             padding: 10px;
             border: 1px solid #444;
             background: #111;
@@ -147,13 +148,49 @@
             font-size: 1rem;
         }
 
-        input {
-            width: 45%;
+        input[type="text"] {
+            width: 40%;
         }
 
         select {
-            width: 45%;
+            width: 40%;
             cursor: pointer;
+        }
+
+        /* Color picker container styling */
+        .color-picker-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-picker-label {
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: 1px solid #444;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: #111;
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 2px;
         }
 
         button {
@@ -218,9 +255,10 @@
             border-color: var(--accent-color);
         }
 
+        /* Marked state uses dynamic --active-color variable */
         .cell.marked {
             background-color: var(--active-color);
-            border-color: #63b3ed;
+            border-color: #ffffff;
             color: #fff;
         }
 
@@ -360,7 +398,6 @@
                 <input type="color" id="squareColorInput" value="#3a5fcd" title="Choose marked square colour">
             </div>
         </div>
-        </div>
         <button onclick="generateCard()">Generate Card</button>
     </div>
 
@@ -446,8 +483,7 @@
         "Aggy makes gnome sound",
         "Aggy wears colour besides black, white, or grey irl",
         "Chat spams GAYGE",
-        "Only for genius move",
-        
+        "Only for genius move"
     ];
 
     // STEP 4: BINGO MATCH POOL
@@ -558,6 +594,11 @@
 
     document.getElementById('headerImage').src = HEADER_IMAGE_URL;
 
+    // Allows changing marked cell colours live on the card
+    document.getElementById('squareColorInput').addEventListener('input', (e) => {
+        document.documentElement.style.setProperty('--active-color', e.target.value);
+    });
+
     const BINGO_COMBINATIONS = [
         [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
         [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
@@ -630,7 +671,7 @@
 
     function seededShuffle(array, randomFunc) {
         let shuffled = [...array];
-        for (let i = shuffled.length -1; i > 0; i--) {
+        for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(randomFunc() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
@@ -641,6 +682,7 @@
     function generateCard() {
         const username = document.getElementById('usernameInput').value.trim();
         const selectedGame = document.getElementById('gameSelect').value;
+        const selectedColor = document.getElementById('squareColorInput').value;
 
         if (!username) {
             alert("Please enter your Twitch username!");
@@ -648,6 +690,9 @@
         }
         activeUsername = username;
         completedBingos = []; 
+
+        // Update the CSS active color variable to match user selection
+        document.documentElement.style.setProperty('--active-color', selectedColor);
 
         const combinedSeedString = `${username.toLowerCase()}_${selectedGame}_${CURRENT_RUN_ID}`;
         const seed = cyrb128(combinedSeedString)[0];
@@ -676,7 +721,6 @@
                 cell.classList.add('free-space', 'marked');
                 
                 const img = document.createElement('img');
-                // Fetch from map, fallback to Elden Rando if undefined
                 img.src = MODE_IMAGES[selectedGame] || MODE_IMAGES['elden_rando'];
                 img.alt = "Free Space Asset Pic";
                 img.classList.add('free-space-img');
