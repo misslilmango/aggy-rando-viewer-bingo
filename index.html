@@ -63,13 +63,6 @@
             font-weight: 600;
         }
 
-        .week-info {
-            font-size: 0.9rem;
-            color: #999;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
         .reset-notice {
             font-size: 0.78rem;
             color: #ff9f9f;
@@ -364,11 +357,9 @@
         Idea by <span>UltimaPhoenix2405</span> | Implemented by <span>misslilmango</span>
     </div>
 
-    <div class="suggestions" style="margin-bottom: 3px;">
+    <div class="suggestions" style="margin-bottom: 12px;">
         Special thanks to lucybonfire, BumbleXP, palehyde, and conquerorthicc
     </div>
-
-    <div class="week-info" id="weekInfo"></div>
 
     <div class="info-box">
         <h3>How to Play & Board Options</h3>
@@ -617,24 +608,6 @@
     }
 
     const CURRENT_RUN_ID = getYearAndWeekString();
-
-    function updateRunSubtitle(gameName) {
-        const readableGame = { 
-            elden_rando: "Elden Ring Rando", 
-            ds1_rando: "Dark Souls 1 Rando", 
-            ds2_rando: "Dark Souls 2 Rando", 
-            ds3_rando: "Dark Souls 3 Rando",
-            stream_bingo: "Elden Ring Bingo"
-        }[gameName] || "Souls Challenge";
-
-        const cleanRunLabel = CURRENT_RUN_ID.replace(/_/g, ' ');
-        document.getElementById('weekInfo').innerText = `Current Run: ${readableGame} (${cleanRunLabel})`;
-    }
-    
-    updateRunSubtitle(document.getElementById('gameSelect').value);
-    document.getElementById('gameSelect').addEventListener('change', (e) => {
-        updateRunSubtitle(e.target.value);
-    });
 
     // --- SEEDABLE RANDOM LOGIC ---
     function cyrb128(str) {
