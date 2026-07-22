@@ -355,6 +355,11 @@
                 <option value="ds3_rando">Dark Souls 3 Rando</option>
                 <option value="stream_bingo">Elden Ring Bingo</option>
             </select>
+            <div class="color-picker-wrapper">
+                <span class="color-picker-label">Mark</span>
+                <input type="color" id="squareColorInput" value="#3a5fcd" title="Choose marked square colour">
+            </div>
+        </div>
         </div>
         <button onclick="generateCard()">Generate Card</button>
     </div>
@@ -391,7 +396,7 @@
 
     // STEP 3: RANDO-ONLY GENERAL POOL
     const RANDO_GENERAL_POOL = [
-        "Dies to sloped terrain",
+        "Dies to sloped terrain during boss fight",
         "Parkour related gravity death",
         "Failed speedrun skip",
         "First-try boss kill",
@@ -402,7 +407,7 @@
         "Dies with >30k currency on hand", 
         "Dies during runback to boss", 
         "Aggy comments on character outfit",
-        "Dies to delayed enemy attack",
+        "Dies to a delayed enemy attack",
         "Absence of upgrade mats",
         "Chat drops the ball on a backseat tip",
         "Scarlet makes appearance",
@@ -414,34 +419,35 @@
         "Aggy argues with a lone viewer in chat",
         "Sip of Windex",
         "Aggy says 'BWAH'",
-        "PB achieved",
+        "Aggy says 'buh'",
         "First time chatter gets banned",
         "Aggy goes on a random tangent",
         "At least 5 subs gifted",
         "Chat spams plinK",
         "Chat gets put in emote only",
         "Aggy HUH farming",
-        "Fextra being correct for once",
+        "Fextra is correct for once",
         "Aggy shrieks like a pterodactyl",
         "Parky appearance on camera",
-        "Sniped by projectile",
         "Raid by one of the gang",
         "Food is ordered",
-        "DS2 scam (he vetos it)",
         "Chat relays a message from Parky",
         "No-hit boss kill",
-        "'Why is it called the French challenge?'",
+        "Chatter asks about the French challenge",
         "Aggy says 'first try' after dying to a boss at least 3 times",
         "Skippa da Grace and dies",
         "no mods, no bans, we cats, we jam",
         "Aggy denies furry allegations",
-        "Gamer skip on first try",
+        "Leyndell gamer skip on first try",
         "Aggy acknowledges why he never acknowledges YT chat",
         "Dies to status effect",
         "Aggy brings out 'the guy'",
-        "Something unthinkable happens and Aggy yells 'WHAAAAAT?!?'",
+        "Something unthinkable happens and Aggy yells 'WHAAAT?!?'",
         "Aggy makes gnome sound",
-        "Aggy wears colour besides black, white, or grey"
+        "Aggy wears colour besides black, white, or grey irl",
+        "Chat spams GAYGE",
+        "Only for genius move",
+        
     ];
 
     // STEP 4: BINGO MATCH POOL
@@ -517,14 +523,17 @@
             "Sniped off Torrent by projectile",
             "Aggy complains about Ordina skip",
             "Kills Boc (SAD)",
-            "Acquires Stormhawk Deenh"
+            "Acquires Stormhawk Deenh",
+            "DS2 scam (he vetoed it)",
+            "DICKSTAB or DICKSMASH"
         ],
         ds1_rando: [
             "Anor Londo archers shoot Aggy off ledge",
             "Bone wheel death",
             "Enemy mob makes it into Seath's arena",
             "Uses crossbow",
-            "Dragon butt in Undead Burg"
+            "Dragon butt in Undead Burg",
+            "DS2 scam (he vetoed it)"
         ],
         ds2_rando: [
             "Aggros an enemy in Majula",
@@ -537,7 +546,8 @@
             "Stunlocked to death by a pack of dogs",
             "Chased by giant crab",
             "Forced to kill Dancer replacement to acquire banner",
-            "Jailer shrinks max HP to 50% or less"
+            "Jailer shrinks max HP to 50% or less",
+            "DS2 scam (he vetoed it)"
         ]
     };
 
