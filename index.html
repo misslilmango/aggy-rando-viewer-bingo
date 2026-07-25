@@ -364,10 +364,10 @@
     <div class="info-box">
         <h3>How to Play & Board Options</h3>
         <ul>
-            <li><strong>Bingo Etiquette:</strong> Please keep it fun and fair! Do not use your card as an excuse to backseat, influence gameplay, or fish for squares in chat. Let outcomes happen naturally!</li>
+            <li><strong>Bingo Etiquette:</strong> Please do not use your card as an excuse to backseat or influence gameplay. Let outcomes happen naturally!</li>
             <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to tracking LilAggy's weekly randomizer gameplay.</li>
             <li><strong>Elden Ring Bingo Mode:</strong> This pool is universal and built to work for ANY streamer matchup, including Bingo Brawlers events. Generic text indicators like "Gets first square" apply to the streamer you are currently rooting for.</li>
-            <li><strong>Boards Reset at 6AM EST/EDT Daily:</strong> If you need multiple cards before the reset, simply append a number to your username (e.g., username1).</li>
+            <li><strong>Boards Reset at 6AM EST/EDT Daily:</strong> If you need a new card before the reset, append a number to your username (e.g., username1) and regenerate the board.</li>
             <li><strong>Make Suggestions:</strong> Please provide your input on the Discord server by tagging @lil.mango!</li>
         </ul>
     </div>
@@ -477,7 +477,6 @@
 
     // STEP 4: BINGO MATCH POOL
     const STREAM_BINGO_POOL = [
-        "Players choose the same starting square",
         "Opponent claims square during a loading screen",
         "Either player completes 2+ squares at once",
         "Opponent gets first square",
@@ -501,7 +500,7 @@
         "Chat spams HOLY",
         "Has progress towards 3+ squares",
         "Kills a friendly NPC",
-        "At least 5 subs gifted during match",
+        "At least 5 subs gifted during the match",
         "Dies during runback to boss",
         "Greeds for final hit and dies",
         "Gets a no-hit boss kill",
@@ -510,12 +509,12 @@
         "Uses Wild Strikes, Unsheathe, or Square Off",
         "Predicts opponents' next square",
         "A single kill gives progress for 2+ squares",
-        "Goes silent for 2+ minutes",
+        "Goes silent for 1+ minutes",
         "Crashing out/dooming",
         "Takes the lead after being 2+ squares behind",
-        "Has 2+ deaths to a boss",
-        "Dies to fall damage",
-        "Uses Star Fist, Bloodhounds Fang, Great Katana, or Lizard Greatsword",
+        "2+ deaths to the same situation",
+        "Unintentional gravity death",
+        "Uses iconic/meta weapon",
         "Takes off all armour",
         "Dies to NPC invader or boss",
         "Gets a max upgraded weapon",
@@ -524,17 +523,23 @@
         "Gets bled or frosted by an enemy",
         "Wears Rya's Robes, Albinauric Mask, Gravebird Armour, or Dane's Hat",
         "'Somewhere, a heavy door has opened'",
-        "Takes a coffin for a joyride",
+        "Takes a coffin or teleporter for a joyride",
         "Finishes a boss with a kukri or throwing knife",
         "Equips a scarseal or soreseal talisman",
         "Uses any spell or incantation",
-        "Crafts any pot or throwable item",
+        "Crafts or buys any consumable",
         "Kills an enemy that can cause death blight",
         "Performs successful bow cancel tech for speedge",
         "Uses a flask to resummon Torrent mid fight",
-        "Performs skip first try",
+        "Performs a skip first try",
         "Uses Memory of Grace",
-        "Running around with 100k+ runes"
+        "Runs around with 100k+ runes",
+        "Hard pivots off a square, giving it up",
+        "Gets grabbed by an enemy",
+        "DICKSTAB or DICKSMASH",
+        "Uses a grease on a weapon",
+        "Reach 7 flasks in base OR 8 scadu in DLC",
+        "Accidental flask chug"
     ];
 
     // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
