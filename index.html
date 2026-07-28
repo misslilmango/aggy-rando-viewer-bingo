@@ -9,12 +9,15 @@
     <!-- canvas-confetti for celebration -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        /* ===========================================================================
+           GLOBAL CSS VARIABLES
+           =========================================================================== */
         :root {
             --bg-color: #1a1a1a;
             --card-bg: #2d2d2d;
             --text-color: #e0e0e0;
             --accent-color: #ff4a4a;
-            --active-color: #3a5fcd;
+            --active-color: #3a5fcd; /* Dynamically updated via the colour picker */
         }
 
         body {
@@ -148,6 +151,7 @@
             cursor: pointer;
         }
 
+        /* Colour Picker Styling */
         .color-picker-wrapper {
             display: flex;
             flex-direction: column;
@@ -212,6 +216,9 @@
             border: 1px solid #333;
         }
 
+        /* ===========================================================================
+           BINGO GRID STYLING
+           =========================================================================== */
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -220,7 +227,7 @@
         }
 
         .cell {
-            aspect-ratio: 1;
+            aspect-ratio: 1; /* Keeps cells square */
             background-color: var(--card-bg);
             border: 2px solid #444;
             border-radius: 6px;
@@ -245,16 +252,74 @@
             border-color: var(--accent-color);
         }
 
+        /* Toggled when user clicks a square */
         .cell.marked {
             background-color: var(--active-color);
             border-color: #ffffff;
             color: #fff;
         }
 
+        /* Center Space Formatting */
         .cell.free-space {
             background-color: #443355;
             border-color: #9f7aea;
             padding: 0;
+        }
+
+        /* ===========================================================================
+           META BINGO MINI-BOARD STYLING
+           Makes a 5x5 sub-grid inside individual cells for coordinate tracking
+           =========================================================================== */
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 1.5px;
+            width: 36px;
+            height: 36px;
+            background: #111;
+            padding: 2px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            margin-bottom: 4px;
+            pointer-events: none; /* Prevents mini-grid from intercepting cell clicks */
+        }
+
+        .mini-dot {
+            background: #333;
+            border-radius: 1px;
+        }
+
+        /* Free space marker inside the mini-grid */
+        .mini-dot.free {
+            background: #6b46c1;
+        }
+
+        /* The targeted coordinate highlight */
+        .mini-dot.target {
+            background: #ff4a4a;
+            box-shadow: 0 0 4px #ff4a4a;
+        }
+
+        /* Styling shifts when the main cell gets marked */
+        .cell.marked .mini-grid {
+            border-color: #fff;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .cell.marked .mini-dot {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .cell.marked .mini-dot.target {
+            background: #fff;
+            box-shadow: 0 0 5px #fff;
+        }
+
+        .mini-grid-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .free-space-img {
@@ -323,6 +388,7 @@
             display: none !important;
         }
 
+        /* Styling for smaller screens like mobile */
         @media (max-width: 600px) {
             .grid {
                 gap: 4px;
@@ -332,6 +398,18 @@
                 font-size: 0.55rem;
                 padding: 3px;
                 line-height: 1.1;
+            }
+
+            .mini-grid {
+                width: 26px;
+                height: 26px;
+                gap: 1px;
+                padding: 1px;
+                margin-bottom: 2px;
+            }
+
+            .mini-grid-label {
+                font-size: 0.52rem;
             }
 
             .free-space-input {
@@ -367,8 +445,8 @@
             <li><strong>Bingo Etiquette:</strong> Please do not use your card as an excuse to backseat or influence gameplay. Let outcomes happen naturally!</li>
             <li><strong>Randomizer Modes:</strong> These pools contain items tailored specifically to tracking LilAggy's weekly randomizer gameplay.</li>
             <li><strong>Elden Ring Bingo Mode:</strong> This pool is universal and built to work for ANY streamer matchup, including Bingo Brawlers events. Generic text indicators like "Gets first square" apply to the streamer you are currently rooting for.</li>
+            <li><strong>Meta Bingo Mode:</strong> Tracks board coordinates rather than in-game events. Mark off coordinates as squares are claimed during the stream.</li>
             <li><strong>Boards Reset at 6AM EST/EDT Daily:</strong> If you need a new card before the reset, append a number to your username (e.g., username1) and regenerate the board.</li>
-            <li><strong>Make Suggestions:</strong> Please provide your input on the Discord server by tagging @lil.mango!</li>
         </ul>
     </div>
 
@@ -381,6 +459,7 @@
                 <option value="ds2_rando">Dark Souls 2 Rando</option>
                 <option value="ds3_rando">Dark Souls 3 Rando</option>
                 <option value="stream_bingo">Elden Ring Bingo</option>
+                <option value="meta_bingo">Meta Bingo</option>
             </select>
             <div class="color-picker-wrapper">
                 <span class="color-picker-label">Mark</span>
@@ -404,23 +483,32 @@
 
 <script>
     /* ===========================================================================
-    UPDATE ZONE
-    ===========================================================================
-    */
+       CONFIG & DATA POOLS
+       =========================================================================== */
 
-    // STEP 1: CONFIG HEADER IMAGE URL
+    // Header logo URL
     const HEADER_IMAGE_URL = "https://i.imgur.com/ZnQQYbK.png";
 
-    // STEP 2: MODE-SPECIFIC MIDDLE IMAGES
+    // Mode-specific middle free space pictures
     const MODE_IMAGES = {
         ds1_rando: "https://i.imgur.com/uFbwFff.png",
         ds2_rando: "https://i.imgur.com/l0ePoIq.png",
         ds3_rando: "https://i.imgur.com/lo5JGEN.jpeg",
         elden_rando: "https://i.imgur.com/9cp5QIu.jpeg",
-        stream_bingo: "https://i.imgur.com/fqnCM30.jpeg"
+        stream_bingo: "https://i.imgur.com/fqnCM30.jpeg",
+        meta_bingo: "https://i.imgur.com/fqnCM30.jpeg"
     };
 
-    // STEP 3: RANDO-ONLY GENERAL POOL
+    // Meta Bingo Pool: 24 grid coordinates (excluding center square)
+    const META_BINGO_POOL = [
+        "R1C1", "R1C2", "R1C3", "R1C4", "R1C5",
+        "R2C1", "R2C2", "R2C3", "R2C4", "R2C5",
+        "R3C1", "R3C2",         "R3C4", "R3C5",
+        "R4C1", "R4C2", "R4C3", "R4C4", "R4C5",
+        "R5C1", "R5C2", "R5C3", "R5C4", "R5C5"
+    ];
+
+    // General shared pool for all randomizer modes
     const RANDO_GENERAL_POOL = [
         "Dies to sloped terrain during boss fight",
         "Parkour related gravity death",
@@ -477,7 +565,7 @@
         "+10 minute split"
     ];
 
-    // STEP 4: BINGO MATCH POOL
+    // Universal Elden Ring Bingo match pool
     const STREAM_BINGO_POOL = [
         "Opponent claims square during a loading screen",
         "Either player completes 2+ squares at once",
@@ -536,7 +624,7 @@
         "Uses Memory of Grace",
         "Runs around with 100k+ runes",
         "Hard pivots off a square, giving it up",
-        "Gets grabbed by an enemy",
+        "Gets grabbed or squashed by an enemy",
         "DICKSTAB or DICKSMASH against Night's Cavalry",
         "Uses grease on a weapon",
         "Reaches 7+ flasks in base OR 8+ scadu in DLC",
@@ -547,7 +635,7 @@
         "Backtracks for a missed item"
     ];
 
-    // STEP 5: GAME-SPECIFIC POOLS (RANDO ONLY)
+    // Specific game additions concatenated onto RANDO_GENERAL_POOL when chosen
     const GAME_POOLS = {
         elden_rando: [
             "Boss killed at RL 1",
@@ -582,31 +670,34 @@
         ]
     };
 
-    /* ===========================================================================
-    END OF UPDATE ZONE
-    ===========================================================================
-    */
-
+    // Apply main header logo 
     document.getElementById('headerImage').src = HEADER_IMAGE_URL;
 
-    // Allows changing marked cell colours live on the card
+    // Allows marked square colours to change on the fly
     document.getElementById('squareColorInput').addEventListener('input', (e) => {
         document.documentElement.style.setProperty('--active-color', e.target.value);
     });
 
+    // All 12 possible winning combinations in a 5x5 bingo matrix
     const BINGO_COMBINATIONS = [
-        [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
-        [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
-        [0, 6, 12, 18, 24], [4, 8, 12, 16, 20]
+        [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24], // Horizontal Rows
+        [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24], // Vertical Columns
+        [0, 6, 12, 18, 24], [4, 8, 12, 16, 20]                                                              // Diagonals
     ];
 
     let activeUsername = "";
-    let completedBingos = []; 
+    let completedBingos = []; // Tracks indexes of already completed lines to prevent repeat confetti
 
+    /* ===========================================================================
+       DAILY SEED DATE LOGIC
+       Generates a run string formatted as Run_YYYY-MM-DD.
+       Streams running past midnight count as the same session until 6:00 AM reset
+       =========================================================================== */
     function getYearAndWeekString() {
         const d = new Date();
         const currentHour = d.getHours();
 
+        // If accessed before 6 AM, make the date go back 1 day to match the previous night's stream date
         if (currentHour < 6) {
             d.setDate(d.getDate() - 1);
         }
@@ -620,7 +711,10 @@
 
     const CURRENT_RUN_ID = getYearAndWeekString();
 
-    // --- SEEDABLE RANDOM LOGIC ---
+    /* ===========================================================================
+       SEEDABLE PSEUDO-RANDOM NUMBER GENERATOR (PRNG)
+       This guarantees that using the same username on the same day gets the same card
+       =========================================================================== */
     function cyrb128(str) {
         let h1 = 1779033703, h2 = 3024733165, h3 = 3362453659, h4 = 502499485;
         for (let i = 0, k; i < str.length; i++) {
@@ -646,6 +740,7 @@
         }
     }
 
+    // Seeded Fisher-Yates array shuffle logic
     function seededShuffle(array, randomFunc) {
         let shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -655,7 +750,9 @@
         return shuffled;
     }
 
-    // --- GENERATE CARD ---
+    /* ===========================================================================
+       CARD GENERATION
+       =========================================================================== */
     function generateCard() {
         const username = document.getElementById('usernameInput').value.trim();
         const selectedGame = document.getElementById('gameSelect').value;
@@ -666,23 +763,28 @@
             return;
         }
         activeUsername = username;
-        completedBingos = []; 
+        completedBingos = []; // Reset completed win lines array on card generation
 
-        // Update the CSS active color variable to match user selection
+        // Update active colour variable
         document.documentElement.style.setProperty('--active-color', selectedColor);
 
+        // Combine inputs into unique seed string: username_gamemode_date
         const combinedSeedString = `${username.toLowerCase()}_${selectedGame}_${CURRENT_RUN_ID}`;
         const seed = cyrb128(combinedSeedString)[0];
         const prng = mulberry32(seed);
 
+        // Integrate item pools depending on selected mode
         let integratedPool = [];
         if (selectedGame === 'stream_bingo') {
             integratedPool = [...STREAM_BINGO_POOL];
+        } else if (selectedGame === 'meta_bingo') {
+            integratedPool = [...META_BINGO_POOL];
         } else {
             const gameSpecificPool = GAME_POOLS[selectedGame] || [];
             integratedPool = [...RANDO_GENERAL_POOL, ...gameSpecificPool];
         }
 
+        // Shuffle pool based on seed
         const shuffledPool = seededShuffle(integratedPool, prng);
 
         const gridElement = document.getElementById('bingoGrid');
@@ -694,16 +796,18 @@
             cell.classList.add('cell');
             cell.dataset.index = i;
 
+            // Index 12 is the center slot on a 5x5 board
             if (i === 12) {
                 cell.classList.add('free-space', 'marked');
                 
+                // Put mode-specific image inside the center square
                 const img = document.createElement('img');
                 img.src = MODE_IMAGES[selectedGame] || MODE_IMAGES['elden_rando'];
                 img.alt = "Free Space Asset Pic";
                 img.classList.add('free-space-img');
                 
                 img.onerror = function() {
-                    this.style.display = 'none';
+                    this.style.display = 'none'; // if image fails to load
                 };
 
                 const controls = document.createElement('div');
@@ -718,7 +822,7 @@
                 hint.innerText = 'Click to edit';
                 
                 textarea.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Prevents clicking the textarea from unmarking the free space
                 });
 
                 controls.appendChild(textarea);
@@ -727,9 +831,45 @@
                 cell.appendChild(img);
                 cell.appendChild(controls);
             } else {
-                cell.innerText = shuffledPool[poolIndex] || "Empty Slot";
+                const itemText = shuffledPool[poolIndex] || "Empty Slot";
+
+                // Meta Bingo mode mini-board creation
+                if (selectedGame === 'meta_bingo' && itemText.match(/^R[1-5]C[1-5]$/)) {
+                    const targetRow = parseInt(itemText.charAt(1));
+                    const targetCol = parseInt(itemText.charAt(3));
+
+                    // Build 5x5 mini-grid
+                    const miniGrid = document.createElement('div');
+                    miniGrid.classList.add('mini-grid');
+
+                    // Generate 25 dots for the mini-board coordinates
+                    for (let r = 1; r <= 5; r++) {
+                        for (let c = 1; c <= 5; c++) {
+                            const dot = document.createElement('div');
+                            dot.classList.add('mini-dot');
+                            if (r === 3 && c === 3) {
+                                dot.classList.add('free'); // Style center dot
+                            }
+                            if (r === targetRow && c === targetCol) {
+                                dot.classList.add('target'); // Highlight the target coordinate
+                            }
+                            miniGrid.appendChild(dot);
+                        }
+                    }
+
+                    const label = document.createElement('span');
+                    label.classList.add('mini-grid-label');
+                    label.innerText = itemText;
+
+                    cell.appendChild(miniGrid);
+                    cell.appendChild(label);
+                } else {
+                    cell.innerText = itemText;
+                }
+                
                 poolIndex++;
                 
+                // Toggle square marked state on click and perform win check
                 cell.addEventListener('click', () => {
                     cell.classList.toggle('marked');
                     checkBingo();
@@ -738,6 +878,7 @@
             gridElement.appendChild(cell);
         }
 
+        // Format timestamp
         const now = new Date();
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
         const formattedTimestamp = now.toLocaleString(undefined, options);
@@ -747,7 +888,8 @@
             ds1_rando: "Dark Souls 1 Rando", 
             ds2_rando: "Dark Souls 2 Rando", 
             ds3_rando: "Dark Souls 3 Rando",
-            stream_bingo: "Elden Ring Bingo"
+            stream_bingo: "Elden Ring Bingo",
+            meta_bingo: "Meta Bingo"
         };
         document.getElementById('cardOwnerHeader').innerText = `${username}'s Bingo Card`;
         document.getElementById('runSubtitle').innerText = `${gameLabels[selectedGame]} - ${CURRENT_RUN_ID.replace(/_/g, ' ')}`;
@@ -755,20 +897,25 @@
         document.getElementById('bingoArea').classList.remove('hidden');
     }
 
-    // --- BINGO CHECK ---
+    /* ===========================================================================
+       WIN CONDITION & CONFETTI
+       =========================================================================== */
     function checkBingo() {
         const cells = document.querySelectorAll('.cell');
         let newBingoDetected = false;
 
         BINGO_COMBINATIONS.forEach((combination, combIndex) => {
+            // Check if each cell index in a winning combination has the 'marked' class
             const isComboComplete = combination.every(index => cells[index].classList.contains('marked'));
 
             if (isComboComplete) {
+                // Trigger confetti only if this line combination hasn't been completed already
                 if (!completedBingos.includes(combIndex)) {
                     completedBingos.push(combIndex);
                     newBingoDetected = true;
                 }
             } else {
+                // If user unmarks a cell breaking a line, remove that line index from completed list
                 const indexInCompleted = completedBingos.indexOf(combIndex);
                 if (indexInCompleted > -1) {
                     completedBingos.splice(indexInCompleted, 1);
@@ -781,20 +928,23 @@
         }
     }
 
-    // --- CONFETTI CELEBRATION ---
+    // Fire confetti burst
     function triggerConfetti() {
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.1, y: 0.6 } });
         confetti({ particleCount: 150, spread: 80, origin: { x: 0.9, y: 0.6 } });
     }
 
-    // --- IMAGE GENERATION AND DOWNLOAD ---
+    /* ===========================================================================
+       PNG EXPORT / DOWNLOAD LOGIC
+       Render the card into a high-res PNG yippee
+       =========================================================================== */
     function downloadPNG() {
         const element = document.getElementById('captureContainer');
         
         html2canvas(element, {
             backgroundColor: "#1a1a1a",
-            scale: 2,
-            useCORS: true
+            scale: 2, // Doubles rendering resolution
+            useCORS: true // Allows imgur links to capture properly
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             const link = document.createElement('a');
